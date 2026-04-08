@@ -1,3 +1,7 @@
+html {
+    scroll-behavior: smooth;
+}
+
 /********** Template CSS **********/
 :root {
     --primary: #4AC4F3;
