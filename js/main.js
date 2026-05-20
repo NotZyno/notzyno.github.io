@@ -10,9 +10,11 @@
         }, 1);
     };
     spinner();
-
-    // Initiate the wowjs
-    new WOW().init();
+    
+    // Initiate the wowjs - Zoptymalizowane (wyłączone śledzenie live naprawia ogólny lag)
+    new WOW({
+        live: false
+    }).init();
 
 
     // Sticky Navbar
@@ -25,26 +27,23 @@
     });
 
 
-     // Smooth scrolling on the navbar links
+    // Smooth scrolling on the navbar links - Naprawa szarpnięcia i laga startowego
     $(".navbar-nav a").on('click', function (event) {
         if (this.hash !== "") {
             event.preventDefault();
             
-            // 1. Naprawa szarpnięcia Home: zabezpieczenie przed wartością ujemną
+            // Bezpieczne wyliczenie pozycji (likwiduje ujemne wartości dla #home)
             var targetScroll = $(this.hash).offset().top - 60;
             if (targetScroll < 0) {
                 targetScroll = 0;
             }
             
-            // 2. Naprawa laga na wszystkich przyciskach: 
-            // Opóźniamy animację o 1 milisekundę za pomocą setTimeout.
-            // Dzięki temu przeglądarka najpierw zamknie menu mobilne i obsłuży kliknięcie, 
-            // a dopiero potem zacznie liczyć animację, co likwiduje lag startowy.
+            // Bufor 30ms daje przeglądarce czas na procesy tła przed startem animacji
             setTimeout(function() {
                 $('html, body').stop().animate({
                     scrollTop: targetScroll
                 }, 600, 'swing');
-            }, 1);
+            }, 30);
             
             if ($(this).parents('.navbar-nav').length) {
                 $('.navbar-nav .active').removeClass('active');
@@ -52,8 +51,6 @@
             }
         }
     });
-
-    let a = 4;
     
     
     // Back to top button
@@ -100,4 +97,3 @@
     });
     
 })(jQuery);
-
