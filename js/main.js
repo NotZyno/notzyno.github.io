@@ -31,9 +31,9 @@
         if (this.hash !== "") {
             event.preventDefault();
             
-            $('html, body').animate({
+            $('html, body').stop().animate({
                 scrollTop: $(this.hash).offset().top - 60
-            }, 1500, 'easeInOutExpo');
+            }, 600, 'swing');
             
             if ($(this).parents('.navbar-nav').length) {
                 $('.navbar-nav .active').removeClass('active');
@@ -41,6 +41,8 @@
             }
         }
     });
+
+    let a = 4;
     
     
     // Back to top button
@@ -52,7 +54,7 @@
         }
     });
     $('.back-to-top').click(function () {
-        $('html, body').animate({scrollTop: 0}, 1500, 'easeInOutExpo');
+        $('html, body').stop().animate({scrollTop: 0}, 600, 'swing');
         return false;
     });
 
