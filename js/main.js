@@ -31,8 +31,17 @@
         if (this.hash !== "") {
             event.preventDefault();
             
+            // 1. Obliczamy pozycję docelową z uwzględnieniem menu
+            var targetScroll = $(this.hash).offset().top - 60;
+            
+            // 2. NOWOŚĆ: Jeśli pozycja jest mniejsza niż 0 (np. dla #home), ustawiamy równy 0
+            if (targetScroll < 0) {
+                targetScroll = 0;
+            }
+            
+            // 3. Wykonujemy płynną i bezpieczną animację
             $('html, body').stop().animate({
-                scrollTop: $(this.hash).offset().top - 60
+                scrollTop: targetScroll
             }, 600, 'swing');
             
             if ($(this).parents('.navbar-nav').length) {
