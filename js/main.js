@@ -26,23 +26,26 @@
     });
 
 
-    // Smooth scrolling on the navbar links
+     // Smooth scrolling on the navbar links
     $(".navbar-nav a").on('click', function (event) {
         if (this.hash !== "") {
             event.preventDefault();
             
-            // 1. Obliczamy pozycję docelową z uwzględnieniem menu
+            // 1. Naprawa szarpnięcia Home: zabezpieczenie przed wartością ujemną
             var targetScroll = $(this.hash).offset().top - 60;
-            
-            // 2. NOWOŚĆ: Jeśli pozycja jest mniejsza niż 0 (np. dla #home), ustawiamy równy 0
             if (targetScroll < 0) {
                 targetScroll = 0;
             }
             
-            // 3. Wykonujemy płynną i bezpieczną animację
-            $('html, body').stop().animate({
-                scrollTop: targetScroll
-            }, 600, 'swing');
+            // 2. Naprawa laga na wszystkich przyciskach: 
+            // Opóźniamy animację o 1 milisekundę za pomocą setTimeout.
+            // Dzięki temu przeglądarka najpierw zamknie menu mobilne i obsłuży kliknięcie, 
+            // a dopiero potem zacznie liczyć animację, co likwiduje lag startowy.
+            setTimeout(function() {
+                $('html, body').stop().animate({
+                    scrollTop: targetScroll
+                }, 600, 'swing');
+            }, 1);
             
             if ($(this).parents('.navbar-nav').length) {
                 $('.navbar-nav .active').removeClass('active');
