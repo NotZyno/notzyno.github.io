@@ -1,8 +1,8 @@
 (function ($) {
     "use strict";
 
-    // Zmienna pomocnicza blokująca sprawdzanie scrolla podczas animacji menu
-    var isAnimatingScroll = false;
+    // Zmienna blokująca zbędne przeliczenia scrolla, bez dotykania klas CSS
+    var isScrollingToSection = false;
 
     // Spinner
     var spinner = function () {
@@ -14,15 +14,16 @@
     };
     spinner();
     
-    // Initiate the wowjs
+    // Initiate the wowjs zoptymalizowane pod kątem wydajności skoku
     new WOW({
         live: false
     }).init();
 
 
-    // Sticky Navbar - Zmodyfikowane: reaguje tylko wtedy, gdy NIE trwa animacja skoku
+    // Sticky Navbar
     $(window).scroll(function () {
-        if (isAnimatingScroll) return; // Jeśli animujemy, ignoruj przeliczanie klas menu!
+        // Jeśli właśnie przewijamy animacją JS, ignorujemy pętlę scrolla, aby odciążyć CPU
+        if (isScrollingToSection) return; 
         
         if ($(this).scrollTop() > 45) {
             $('.navbar').addClass('sticky-top shadow-sm');
@@ -32,7 +33,7 @@
     });
 
 
-    // Smooth scrolling on the navbar links - Naprawa laga startowego i blokada scroll listenera
+    // Smooth scrolling on the navbar links
     $(".navbar-nav a").on('click', function (event) {
         if (this.hash !== "") {
             event.preventDefault();
@@ -42,22 +43,21 @@
                 targetScroll = 0;
             }
             
-            // 1. Włączamy blokadę dla skryptu Sticky Navbar
-            isAnimatingScroll = true;
-
-            // 2. Jeśli wracamy na samą górę (Home), od razu przygotowujemy stan paska nawigacji
-            if (targetScroll === 0) {
-                $('.navbar').removeClass('sticky-top shadow-sm');
-            } else {
-                $('.navbar').addClass('sticky-top shadow-sm');
-            }
+            // Włączamy blokadę obciążenia procesora
+            isScrollingToSection = true;
             
-            // 3. Wykonujemy animację bez ingerencji zdarzenia scroll window
             $('html, body').stop().animate({
                 scrollTop: targetScroll
             }, 600, 'swing', function() {
-                // 4. Funkcja callback: po zakończeniu animacji zdejmujemy blokadę
-                isAnimatingScroll = false;
+                // Po ukończeniu ruchu, przywracamy naturalny nasłuch scrolla
+                isScrollingToSection = false;
+                
+                // Upewniamy się, że pasek po zakończeniu ruchu ma właściwą klasę na samej górze
+                if ($(window).scrollTop() <= 45) {
+                    $('.navbar').removeClass('sticky-top shadow-sm');
+                } else {
+                    $('.navbar').addClass('sticky-top shadow-sm');
+                }
             });
             
             if ($(this).parents('.navbar-nav').length) {
@@ -70,7 +70,7 @@
     
     // Back to top button
     $(window).scroll(function () {
-        if (isAnimatingScroll) return; // Ignoruj podczas animacji
+        if (isScrollingToSection) return;
         if ($(this).scrollTop() > 100) {
             $('.back-to-top').fadeIn('slow');
         } else {
@@ -78,11 +78,11 @@
         }
     });
     $('.back-to-top').click(function () {
-        isAnimatingScroll = true;
-        $('.navbar').removeClass('sticky-top shadow-sm'); // Przygotuj navbar na powrót na górę
+        isScrollingToSection = true;
         
         $('html, body').stop().animate({scrollTop: 0}, 600, 'swing', function() {
-            isAnimatingScroll = false;
+            isScrollingToSection = false;
+            $('.navbar').removeClass('sticky-top shadow-sm');
         });
         return false;
     });
